@@ -169,6 +169,10 @@ method(stream_merge_chunks, ProviderClaude) <- function(provider, result, chunk)
   } else if (chunk$type == "content_block_delta") {
     if (chunk$delta$type == "text_delta") {
       paste(result$content[[chunk$index + 1L]]$text) <- chunk$delta$text
+    } else if (chunk$delta$type == "thinking_delta") {
+      paste(result$content[[chunk$index + 1L]]$thinking) <- chunk$delta$thinking
+    } else if (chunk$delta$type == "signature_delta") {
+      paste(result$content[[chunk$index + 1L]]$signature) <- chunk$delta$signature
     } else if (chunk$delta$type == "input_json_delta") {
       if (chunk$delta$partial_json != "") {
         # See issue #228 about partial_json sometimes being ""
@@ -211,6 +215,8 @@ method(value_turn, ProviderClaude) <- function(provider, result, has_type = FALS
         }
         ContentToolRequest(content$id, content$name, content$input)
       }
+    } else if (content$type == "thinking") {
+      ContentThinking(content$thinking, content$signature)
     } else {
       cli::cli_abort(
         "Unknown content type {.str {content$type}}.",
@@ -240,6 +246,10 @@ method(as_json, list(ProviderClaude, Turn)) <- function(provider, x) {
 
 method(as_json, list(ProviderClaude, ContentText)) <- function(provider, x) {
   list(type = "text", text = x@text)
+}
+
+method(as_json, list(ProviderClaude, ContentThinking)) <- function(provider, x) {
+  list(type = "thinking", thinking = x@thinking, signature = x@signature)
 }
 
 method(as_json, list(ProviderClaude, ContentPDF)) <- function(provider, x) {

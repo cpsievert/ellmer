@@ -118,6 +118,31 @@ method(contents_markdown, ContentText) <- function(content) {
   content@text
 }
 
+#' @rdname Content
+#' @export
+#' @param text A single string.
+ContentThinking <- new_class(
+  "ContentThinking",
+  parent = Content,
+  properties = list(thinking = prop_string(), signature = prop_string()),
+)
+method(format, ContentThinking) <- function(x, ...) {
+  x@thinking
+}
+
+method(contents_text, ContentThinking) <- function(content) {
+  content@thinking
+}
+
+method(contents_html, ContentThinking) <- function(content) {
+  check_installed("commonmark")
+  commonmark::markdown_html(content@thinking)
+}
+
+method(contents_markdown, ContentThinking) <- function(content) {
+  content@thinking
+}
+
 # Images -----------------------------------------------------------------
 
 #' @rdname Content
